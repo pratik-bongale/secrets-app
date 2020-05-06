@@ -2,7 +2,9 @@ require("dotenv").config()
 const express = require("express");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
-const encrypt = require("mongoose-encryption");
+//const encrypt = require("mongoose-encryption");
+//const md5 = require("md5");
+const bcrypt = require("bcrypt");
 
 const app = express();
 app.use(express.static("public"));
@@ -16,7 +18,7 @@ const userSchema = new mongoose.Schema({
   password: String
 })
 
-userSchema.plugin(encrypt, {secret: process.end.SECRET, encryptedFields: ["password"]});
+//userSchema.plugin(encrypt, {secret: process.end.SECRET, encryptedFields: ["password"]});
 
 const User = mongoose.model("User", userSchema);
 
@@ -33,11 +35,22 @@ app.post("/login", (req, res) => {
     if(err) {
       res.send("Error occured while trying to login");
     } else {
-      if(foundResult.password === req.body.password) {
-        res.render("secrets");
-      } else {
-        res.send("Incorrect username / password");
+
+      if(foundResult) {
+        bcrypt.compare(req.body.password, foundResult.password).then(function(result) {
+            if( result === true ) {
+              res.render("secrets");
+            } else {
+              res.send("Incorrect username / password");
+            }
+        });
       }
+      // if(foundResult.password === md5(req.body.password)) {
+      // if(foundResult.password === req.body.password) {
+      //   res.render("secrets");
+      // } else {
+      //   res.send("Incorrect username / password");
+      // }
     }
   });
 });
@@ -47,18 +60,24 @@ app.get("/register", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const newUser = new User({
-    email: req.body.username,
-    password: req.body.password
+  const saltRounds = 10;
+  bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+    const newUser = new User({
+      email: req.body.username,
+      // password: md5(req.body.password)
+      password: hash
+    });
+
+    newUser.save((err) => {
+      if(err) {
+        res.send("New User creation failed");
+      } else {
+        res.render("secrets");
+      }
+    });
   });
 
-  newUser.save((err) => {
-    if(err) {
-      res.send("New User creation failed");
-    } else {
-      res.render("secrets");
-    }
-  });
+
 });
 
 app.listen(3000, () => {
