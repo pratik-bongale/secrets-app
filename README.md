@@ -2,7 +2,7 @@
 Now share your secrets anonymously with everyone with our Secrets App
 
 ## Getting Started
-- The App is currently hosted on Heroku. For a quick peek visit [Secrets]().
+- The App is currently hosted on Heroku. For a quick peek visit [Secrets App](https://sheltered-fortress-69442.herokuapp.com/).
 - To build this project locally, follow steps given below.
 
 ### Prerequisites
@@ -46,8 +46,7 @@ Home Page:
   - Register / Login: you need to register/login to post/submit your secret.
   - You can see all secrets submitted on the home page
   - Each user can submit one secret to the database
-  - Even if you navigate away from the website, you will still be able to come back without the need to login again.
-
+  
 ## Learnings
 - This project demonstrates how to:
   - Authenticate users using PassportJs
